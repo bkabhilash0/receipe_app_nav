@@ -1,6 +1,7 @@
 import { enableScreens } from "react-native-screens";
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Platform } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import MealsNavigator from "./navigation/MealsNavigator";
@@ -27,14 +28,16 @@ export default function App() {
     );
   }
 
-  return <MealsNavigator />;
+  return (
+    <>
+      <StatusBar translucent={Platform.OS === "ios"} style="light" hidden={false}/>
+      <MealsNavigator />
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
