@@ -1,3 +1,5 @@
+import { Provider } from "react-redux";
+import store from "./store";
 import { enableScreens } from "react-native-screens";
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Platform } from "react-native";
@@ -29,10 +31,14 @@ export default function App() {
   }
 
   return (
-    <>
-      <StatusBar translucent={Platform.OS === "ios"} style="light" hidden={false}/>
+    <Provider store={store}>
+      <StatusBar
+        translucent={Platform.OS === "ios"}
+        style="light"
+        hidden={false}
+      />
       <MealsNavigator />
-    </>
+    </Provider>
   );
 }
 
