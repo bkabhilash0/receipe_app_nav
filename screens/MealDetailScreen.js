@@ -1,7 +1,11 @@
 import React from "react";
+import { useCallback } from "react";
+import { useEffect } from "react";
 import { StyleSheet, Text, View, ScrollView, Image } from "react-native";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import { toggleFavorite } from "../actions/mealActions";
 import HeaderButton from "../components/CustomHeaderButton";
 import DefaultText from "../components/DefaultText";
 
@@ -12,10 +16,31 @@ const ListItem = (props) => (
 );
 
 const MealDetailScreen = (props) => {
-  const { meals } = useSelector((state) => state.meals);
+  const dispatch = useDispatch();
 
+  const { meals } = useSelector((state) => state.meals);
   const mealId = props.navigation.getParam("mealId");
+
   const selectedMeal = meals.find((meal) => meal.id === mealId);
+  const isFavorite = useSelector((state) =>
+    state.meals.favourites.some((fav) => fav.id === mealId)
+  );
+
+  const toggleFavoriteHandler = useCallback(() => {
+    dispatch(toggleFavorite(mealId));
+  }, [dispatch, mealId]);
+
+  useEffect(() => {
+    props.navigation.setParams({
+      toggleFav: toggleFavoriteHandler,
+    });
+  }, [toggleFavorite]);
+
+  useEffect(() => {
+    props.navigation.setParams({
+      isFavorite,
+    });
+  }, [isFavorite]);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 10 }}>
@@ -44,16 +69,16 @@ const MealDetailScreen = (props) => {
 
 MealDetailScreen.navigationOptions = (navigationData) => {
   const mealTitle = navigationData.navigation.getParam("mealTitle");
+  const favToggleHandler = navigationData.navigation.getParam("toggleFav");
+  const isFavorite = navigationData.navigation.getParam("isFavorite");
   return {
     headerTitle: mealTitle,
     headerRight: () => (
       <HeaderButtons HeaderButtonComponent={HeaderButton}>
         <Item
           title="Favourite"
-          iconName="ios-star"
-          onPress={() => {
-            console.log("Marked as Favourite");
-          }}
+          iconName={isFavorite ? "ios-star" : "ios-star-outline"}
+          onPress={favToggleHandler}
         />
       </HeaderButtons>
     ),
@@ -67,7 +92,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 10,
-    zIndex: 1
+    zIndex: 1,
   },
   details: {
     flexDirection: "row",
@@ -80,7 +105,7 @@ const styles = StyleSheet.create({
     position: "relative",
     top: -7,
     zIndex: 0,
-    paddingTop: 22
+    paddingTop: 22,
   },
   title: {
     fontFamily: "open-sans-bold",
